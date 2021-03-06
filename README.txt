@@ -1,8 +1,8 @@
-# Bulma Builder
+Bulma Builder
 
-NOTE: npm commands overwrite the ./public directory.
+*** NOTE: npm commands overwrite the ./public directory. ***
 
-## 1. Getting Started
+1. Getting Started
 
 Project's source files are placed in ./src/ directory. 
 
@@ -12,9 +12,8 @@ Project's source files are placed in ./src/ directory.
 
 * ./src/*.pug - All your pages (templates) are stored in separated .pug files.
 
-## 2. Installation
+2. Installation
 
-```
 # Install dependencies
 npm install 
 
@@ -23,9 +22,8 @@ npm run watch
 
 # Or make production build
 npm run build
-```
 
-## 3. Contact
+3. Contact
 
 If you have found any bugs in the Bulma Builder, have any questions, 
 comments or ideas for new features feel free to contact us:
