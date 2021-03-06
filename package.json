@@ -16,7 +16,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "css-compile": "node-sass --importer=node_modules/node-sass-tilde-importer/ --output-style expanded --source-map true --source-map-contents true --precision 6 src/scss/bulma-theme.scss src/main/css/main.css"
+    "css-compile": "node-sass --importer=node_modules/node-sass-tilde-importer/ --output-style expanded --source-map true --source-map-contents true --precision 6 src/scss/bulma-theme.scss src/public/css/main.css"
   },
   "repository": {
     "type": "git",
