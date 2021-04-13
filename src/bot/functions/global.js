@@ -6,7 +6,6 @@ module.exports = (client) => {
     client.db = require('../database/mysql');
     client.escapeDB = require('../database/escaping');
     client.categories = require('./categories');
-    client.enc = require('./encryptor');
     client.isUrl = require('../../utils/isUrl');
     client.createId = (length) => {
         var a = "1234567890".split("");
