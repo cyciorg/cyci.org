@@ -21,13 +21,21 @@ const mcc = new MailcowApiClient(process.env.MAILCOW_API_BASEURL, process.env.MA
   const prefix = args[0].toLowerCase(), suffix = args[1].toLowerCase(), fullName = args.slice(2).join(' ');
   const checkUser = await mcc.getUser(`${prefix}@${suffix}`);
   if (checkUser[0].username != undefined) return client.message.error(message, `Existing user! \`An exisiting user was found please choose a new prefix and or suffix domain!\``, "(EXISTING_USER)");
-    client.db.query(`SELECT * FROM cyciTempSignup`, function(err, data) {
+  console.log("its hitting username check");
+  client.db.query(`SELECT * FROM cyciTempSignup`, function(err, data) {
+    console.log("its hitting DB query");
         if (data.length > 1) return client.message.error(message, "Too many requests", "You are being ratelimited due to having an excess amount of requests\nplease wait for us to look at them!", "(RATE_LIMITED)");
         const prefix = args[0].toLowerCase(), suffix = args[1].toLowerCase(), fullName = args.slice(2).join(' ');
         var dayjs = require('dayjs')
+        
         const timestamp = dayjs(new Date()).format("YYYY,MM,DD");
-        client.db.query(`INSERT INTO cyciTempSignup (id, prefix, suffix, name, dateAdded, fileLink) VALUES (${message.author.id}, "${prefix}", "${suffix}", "${fullName}", ${timestamp}, "${data.length+1}")`);
-        client.message.success(message, "channel", `Requested email - ${prefix}@${suffix}-${fullName}`, `Do not fret you have been put on the waiting list\ngive us some time to look this over and soon you\nwill have your own personal email!`);
+        console.log("its hitting insert query");
+        client.db.query(`INSERT INTO cyciTempSignup (id, prefix, suffix, name, dateAdded, fileLink) VALUES (${message.author.id}, "${prefix}", "${suffix}", "${fullName}", ${timestamp}, "${data.length+1}")`)
+        console.log("Its hitting success message");
+        
+        
+        client.message.success(message, "channel", `Requested email - ${prefix}@${suffix}-${fullName}`, `Do not fret you have been put on the waiting list\ngive us some time to look this over and soon you\nwill have your own personal email!`)
+        console.log("webhook");
         const embed = new MessageEmbed().setTitle(`Requested email - ${prefix}@${suffix} [${fullName}]`).setTimestamp(timestamp).setColor("BLUE").setFooter("Give it like 2d bro");
         web.send({embed});
 

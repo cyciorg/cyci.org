@@ -29,7 +29,7 @@ module.exports = async (client, message) => {
         const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
         if (now < expirationTime) {
             const timeLeft = (expirationTime - now) / 1000;
-            return client.global.message.error(message, "command_cooldown", `please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${cmd.help.name}\` command.`, "(COMMAND_ON_COOLDOWN)")
+            return client.message.error(message, `please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${cmd.help.name}\` command.`, "(COMMAND_ON_COOLDOWN)")
         }
     }
 
