@@ -20,7 +20,7 @@ const mcc = new MailcowApiClient(process.env.MAILCOW_API_BASEURL, process.env.MA
   if (checkProfanity.length >= 1) return client.message.error(message, 'No profanity!\n You are not allowed to use profanity within cyci.org or its subsidiary companies!', "(PROFANITY_FOUND)");
   const prefix = args[0].toLowerCase(), suffix = args[1].toLowerCase(), fullName = args.slice(2).join(' ');
   const checkUser = await mcc.getUser(`${prefix}@${suffix}`);
-  if (checkUser) return client.message.error(message, `Existing user! \`An exisiting user was found please choose a new prefix and or suffix domain!\``, "(EXISTING_USER)");
+  if (checkUser[0].username != undefined) return client.message.error(message, `Existing user! \`An exisiting user was found please choose a new prefix and or suffix domain!\``, "(EXISTING_USER)");
     client.db.query(`SELECT * FROM cyciTempSignup`, function(err, data) {
         if (data.length > 1) return client.message.error(message, "Too many requests", "You are being ratelimited due to having an excess amount of requests\nplease wait for us to look at them!", "(RATE_LIMITED)");
         const prefix = args[0].toLowerCase(), suffix = args[1].toLowerCase(), fullName = args.slice(2).join(' ');
