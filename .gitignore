@@ -85,3 +85,7 @@ ecosystem.*.*
 # metis icons // thanks friends!
 metis-assets/
 
+*.yml
+*.sql
+./test.js
+

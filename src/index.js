@@ -16,8 +16,21 @@ function route() {
         logger.log(`index requested by ${ip} - ${who}`)
         resfile(req, res, "index.ejs") 
     });
+    app.get('/signup', function(req, res) { 
+        const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
+        logger.log(`signup requested by ${ip} - ${who}`)
+        resfile(req, res, "signup.ejs") 
+    });
 }
 
 route();
 logger.log("Main - Server started on " + process.env.SERVER_PORT);
-app.listen(process.env.SERVER_PORT, function(err) {if (err) return logger.error("Error! " + err);})
+app.listen(process.env.SERVER_PORT, function(err) {if (err) return logger.error("Error! " + err); require('./bot/index')})
+
+process.on('uncaughtException', (error) => {
+    logger.error('something terrible happened: ' + error);
+})
+process.on('unhandledRejection', (error, promise) => {
+    logger.error(' promise rejection here: ' + promise);
+    logger.error(' The error was: ' + error);
+});
