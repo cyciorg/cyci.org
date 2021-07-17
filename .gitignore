@@ -82,8 +82,8 @@ scss/
 temp.package.json
 ecosystem.*.*
 
-# metis icons // thanks friends!
-metis-assets/
+tailwind.config.js
+
 
 *.yml
 *.sql

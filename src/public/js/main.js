@@ -1,20 +1,40 @@
+// Burger menus
 document.addEventListener('DOMContentLoaded', function() {
-    const toggler = document.querySelectorAll('[data-toggle="side-menu"]');
+    // open
+    const burger = document.querySelectorAll('.navbar-burger');
+    const menu = document.querySelectorAll('.navbar-menu');
 
-    if (toggler.length) {
-        for (var i = 0; i < toggler.length; i++) {
-            const target = toggler[i].getAttribute('data-target');
+    if (burger.length && menu.length) {
+        for (var i = 0; i < burger.length; i++) {
+            burger[i].addEventListener('click', function() {
+                for (var j = 0; j < menu.length; j++) {
+                    menu[j].classList.toggle('hidden');
+                }
+            });
+        }
+    }
 
-            if (target.length) {
-                toggler[i].addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const menu = document.querySelector(target);
-        
-                    if (menu) {
-                        menu.classList.toggle('is-hidden');
-                    }
-                });
-            }
+    // close
+    const close = document.querySelectorAll('.navbar-close');
+    const backdrop = document.querySelectorAll('.navbar-backdrop');
+
+    if (close.length) {
+        for (var i = 0; i < close.length; i++) {
+            close[i].addEventListener('click', function() {
+                for (var j = 0; j < menu.length; j++) {
+                    menu[j].classList.toggle('hidden');
+                }
+            });
+        }
+    }
+
+    if (backdrop.length) {
+        for (var i = 0; i < backdrop.length; i++) {
+            backdrop[i].addEventListener('click', function() {
+                for (var j = 0; j < menu.length; j++) {
+                    menu[j].classList.toggle('hidden');
+                }
+            });
         }
     }
 });
