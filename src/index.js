@@ -24,7 +24,7 @@ function route() {
     app.get('/login', function(req, res) { 
         const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
         //logger.log(`signup requested by ${ip} - ${who}`)
-        resfile(req, res, "signup.ejs") 
+        resfile(req, res, "login.ejs") 
     });
     app.get('/pricing', function(req, res) { 
         const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
