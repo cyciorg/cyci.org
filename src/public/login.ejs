@@ -16,13 +16,7 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <link rel="icon" href="https://cdn.cyci.rocks/576688747481743/31453_LOGOONLY_Showcase_LogoRainbow.svg">
   <script src="./js/main.js"></script>
-  <!-- //<script src="./js/notifToggle.js"></script> -->
-  <script>
-    function notifToggle() {
-      var element = document.getElementById("pageNotif");
-        element.classList.toggle("hidden");
-    }
-  </script>
+  <script src="./js/notifToggle.js"></script>
   </head>
   <body class="antialiased bg-body text-body font-body">
     <div class=""> 
@@ -106,7 +100,7 @@
               <h3 class="mb-2 text-2xl font-bold font-heading text-white">Temporarily disabled</h3>
               <p class="mb-8 text-gray-200 leading-loose">The login page is currently disabled until we finish our backends!</p>
               
-              <a class="inline-block px-12 py-4 text-lg bg-transparent text-white font-bold border border-gray-300 hover:border-gray-200 rounded-full" href="#" onclick="toggleNotif()">OK</a>
+              <a class="inline-block px-12 py-4 text-lg bg-transparent text-white font-bold border border-gray-300 hover:border-gray-200 rounded-full" href="#" onclick="notifToggle()">OK</a>
             </div>
           </div>
         </div>
