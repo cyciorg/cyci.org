@@ -18,13 +18,23 @@ function route() {
     });
     app.get('/signup', function(req, res) { 
         const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-        logger.log(`signup requested by ${ip} - ${who}`)
+        //logger.log(`signup requested by ${ip} - ${who}`)
+        resfile(req, res, "signup.ejs") 
+    });
+    app.get('/login', function(req, res) { 
+        const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
+        //logger.log(`signup requested by ${ip} - ${who}`)
         resfile(req, res, "signup.ejs") 
     });
     app.get('/pricing', function(req, res) { 
         const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-        logger.log(`pricing requested by ${ip} - ${who}`)
+        //logger.log(`pricing requested by ${ip} - ${who}`)
         resfile(req, res, "pricing.ejs") 
+    });
+    app.get('/team', function(req, res) { 
+        const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
+        //logger.log(`signup requested by ${ip} - ${who}`)
+        resfile(req, res, "signup.ejs") 
     });
 }
 

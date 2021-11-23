@@ -9,6 +9,7 @@
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
+    "express-openid-connect": "^2.5.1",
     "mailcow-api": "^1.2.6",
     "mysql": "^2.18.1",
     "node-sass": "^5.0.0",
@@ -19,7 +20,6 @@
     "winston": "^3.3.3",
     "wumpfetch": "^0.3.1"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "css-compile": "node-sass --importer=node_modules/node-sass-tilde-importer/ --output-style expanded --source-map true --source-map-contents true --precision 6 src/scss/bulma-theme.scss src/public/css/main.css"
