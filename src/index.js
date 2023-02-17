@@ -1,123 +1,169 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
-const logger = require('./utils/logger');
-const path = require('path')
-const resfile = require('./utils/renderFile'); // temp in public dir bc weird bug
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var userInViews = require('./lib/userInViews');
-var passport = require('passport');
+const session = require('express-session');
+var RateLimit = require('express-rate-limit');
+var MongoStore = require('rate-limit-mongo');
+const Sentry = require('@sentry/node');
+const Tracing = require("@sentry/tracing");
 const app = express();
-const { auth, requiresAuth } = require('express-openid-connect');
-var Auth0Strategy = require('passport-auth0');
-var authRouter = require('./routes/auth');
-var usersRouter = require('./routes/userPage');
 
-  var strategy = new Auth0Strategy(
-    {
-      domain: "dev-xmxltrh6.us.auth0.com",
-      clientID: process.env.AUTH0_CLIENT_ID,
-      clientSecret: process.env.AUTH0_SECRET,
-      callbackURL: 'https://localhost/callback'
-    },
-    function (accessToken, refreshToken, extraParams, profile, done) {
-      // accessToken is the token to call Auth0 API (not needed in the most cases)
-      // extraParams.id_token has the JSON Web Token
-      // profile has all the information from the user
-      return done(null, profile);
-    }
-  );
-  passport.use(strategy);
+const passport = require('passport');
+const path = require('path');
+const Mongoose = require('mongoose');
+const {
+    connectDb
+} = require('./db/connector.js');
+const User = require('./db/User.schema.js');
+const roles = require('./utils/roles.js');
+const AdminJS = require('adminjs')
+const AdminJSExpress = require('@adminjs/express')
+AdminJS.registerAdapter(require('@adminjs/mongoose'))
 
-  // You can use this section to keep a smaller payload
-  passport.serializeUser(function (user, done) {
+var compression = require('compression');
+const checkAuth = require('./utils/checkAuth.js');
+const checkAuthPlusAdmin = require('./utils/checkAuthPlusAdmin.js');
+var routesArray = [require('./routes/index.js')];
+
+passport.serializeUser(function(user, done) {
     done(null, user);
-  });
-  
-  passport.deserializeUser(function (user, done) {
-    done(null, user);
-  });
+});
+passport.deserializeUser(function(obj, done) {
+    done(null, obj);
+});
 
-function route() {
-    //logger.log("Main - Adding routes ")
+var DiscordStrategy = require('passport-discord').Strategy,
+    refresh = require('passport-oauth2-refresh'),
+    scopes = ['identify', 'email', 'guilds', 'guilds.join'],
+    prompt = 'consent';
+
+var discordStrat = new DiscordStrategy({
+    clientID: process.env.DISCORD_CLIENT_ID,
+    clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    callbackURL: process.env.DISCORD_CALLBACK_URL,
+    scope: scopes,
+    prompt: prompt
+}, function(accessToken, refreshToken, profile, cb) {
+    profile.refreshToken = refreshToken;
+    User.findOrCreate(profile, function(err, user) {
+        if (err) return cb(err);
+        return cb(profile, user);
+    });
+    return cb(null, profile);
+});
+
+function middleWaresOrSets() {
+    passport.use(discordStrat);
+    refresh.use(discordStrat);
+    app.use(compression());
+    app.use(session({
+        secret: 'secret',
+        resave: false,
+        saveUninitialized: false
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+
     app.set('trust proxy', 1);
     app.set('view engine', 'ejs');
-    app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
-    app.use(express.static(path.join(__dirname, 'views'), {extensions: ['css'],}));
-    var sess = {
-        secret: 'CTFRVYGBUHCDnwjkfw687347892GUY#8907246y23$&*($2yguoishdbfjknsf',
-        cookie: {},
-        resave: false,
-        saveUninitialized: true
-      };
-      
-      if (app.get('env') === 'production') {
-        // If you are using a hosting provider which uses a proxy (eg. Heroku),
-        // comment in the following app.set configuration command
-        //
-        // Trust first proxy, to prevent "Unable to verify authorization request state."
-        // errors with passport-auth0.
-        // Ref: https://github.com/auth0/passport-auth0/issues/70#issuecomment-480771614
-        // Ref: https://www.npmjs.com/package/express-session#cookiesecure
-        // app.set('trust proxy', 1);
-        
-        sess.cookie.secure = true; // serve secure cookies, requires https
-      }
-      app.use(session(sess));
-
-        app.use(passport.initialize());
-        app.use(passport.session());
-    // app.use(auth(config));
-    
-    app.use(userInViews());
-    app.use('/', authRouter);
-    app.use('/', usersRouter);
-    app.get('/', function(req, res) { 
-        const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-        //logger.log(`index requested by ${ip} - ${who}`)
-        resfile(req, res, "index.ejs") 
+    app.use(express.static(path.join(__dirname, 'views'), {
+        extensions: ['css']
+    }));
+    Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        integrations: [
+            new Sentry.Integrations.Http({tracing: true}),
+            new Tracing.Integrations.Express({app}),
+    ],
+        tracesSampleRate: 1.0,
     });
-    // app.get('/profile', requiresAuth(), (req, res) => {
-    //     res.send(JSON.stringify(req.oidc.user));
-    // });
-    // app.get('/signup', function(req, res) { 
-    //     const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-    //     //logger.log(`signup requested by ${ip} - ${who}`)
-    //     resfile(req, res, "signup.ejs") 
-    // });
-    // app.get('/login', function(req, res) { 
-    //     const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-    //     //logger.log(`signup requested by ${ip} - ${who}`)
-    //     resfile(req, res, "login.ejs") 
-    // });
-    app.get('/pricing', function(req, res) { 
-        const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-        //logger.log(`pricing requested by ${ip} - ${who}`)
-        resfile(req, res, "pricing.ejs") 
-    });
-    app.get('/team', function(req, res) { 
-        const ip =  req.headers['x-forwarded-for'] || req.socket.remoteAddress, who = req.headers['user-agent'] || "Undefined (1.0.0)";
-        //logger.log(`signup requested by ${ip} - ${who}`)
-        resfile(req, res, "team.ejs") 
-    });
-
+    app.use(Sentry.Handlers.requestHandler());
+    app.use(Sentry.Handlers.tracingHandler());
+    app.use(Sentry.Handlers.errorHandler());
 }
-app.use(function (err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
-route();
-//logger.log("Main - Server started on " + process.env.SERVER_PORT);
-app.listen(process.env.SERVER_PORT, function(err) {if (err) return logger.error("Error! " + err);})
 
-process.on('uncaughtException', (error) => {
-    logger.error('something terrible happened: ' + error);
-})
-process.on('unhandledRejection', (error, promise) => {
-    logger.error(' promise rejection here: ' + promise);
-    logger.error(' The error was: ' + error);
-});
+function routes() {
+    middleWaresOrSets();
+    app.get('/', routesArray[0].get.bind(this));
+    app.get('/api/v1/login', passport.authenticate('discord', {
+        scope: scopes,
+        prompt: prompt
+    }));
+    app.get('/api/v1/callback',
+        passport.authenticate('discord', {
+            failureRedirect: '/'
+        }),
+        function(req, res) {
+            res.redirect('/')
+        });
+    app.get('/api/v1/logout', function(req, res) {
+        req.logout(function(err) {
+            if (err) {
+                return next(err);
+            }
+            res.redirect('/');
+        });
+    });
+
+    connectDb().then(async (errMongo) => {
+        const AdminPanel = new AdminJS({
+            resources: [{
+                resource: User,
+                options: {
+                    actions: {
+                        delete: {
+                            guard: "Are you sure you wish to delete this record?"
+                        },
+                        regenerateToken: {
+                            actionType: 'record',
+                            icon: 'View',
+                            isVisible: true,
+                            component: './adminJsComponents/generateApiComp.jsx',
+                            handler: async (req, res, context) => {
+                                const user = context.record;
+                                const UserAc = context._admin.findResource('UserAccount')
+                                const crypto = require('crypto');
+                                user.param('api_token').value = crypto.randomBytes(32).toString('hex');
+                                return {
+                                    record: user.toJSON(context.currentAdmin)
+                                }
+                            }
+                        }
+                    },
+                    properties: {
+                        api_token: {
+                            type: 'string',
+                            isVisible: {
+                                list: true,
+                                edit: true,
+                                filter: false,
+                                show: false,
+                            },
+                        },
+                    },
+
+                }
+            }, ],
+            branding: {
+                companyName: 'Cyci Org',
+                logo: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
+                softwareBrothers: false,
+                favicon: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
+            },
+            rootPath: '/admin',
+        })
+        const router = AdminJSExpress.buildRouter(AdminPanel, checkAuthPlusAdmin);
+        app.use(AdminPanel.options.rootPath, router)
+        app.listen(process.env.PORT, function(err) {
+            let {
+                BruteForce
+            } = require('./middleware/bruteForce.js');
+
+            if (err) return console.log(err)
+
+            console.log(`Listening on port ${process.env.PORT}`)
+
+        });
+    });
+}
+routes();

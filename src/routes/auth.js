@@ -43,10 +43,11 @@ router.get('/logout', (req, res) => {
   var logoutURL = new url.URL(
     util.format('https://%s/v2/logout', process.env.AUTH0_ISSUER_URL)
   );
-  var searchString = querystring.stringify({
+  var searchString = new URLSearchParams({
     client_id: process.env.AUTH0_CLIENT_ID,
     returnTo: returnTo
   });
+
   logoutURL.search = searchString;
 
   res.redirect(logoutURL);
