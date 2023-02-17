@@ -155,10 +155,7 @@ function routes() {
         const router = AdminJSExpress.buildRouter(AdminPanel, checkAuthPlusAdmin);
         app.use(AdminPanel.options.rootPath, router)
         app.listen(process.env.PORT, function(err) {
-            let {
-                BruteForce
-            } = require('./middleware/bruteForce.js');
-
+          
             if (err) return console.log(err)
 
             console.log(`Listening on port ${process.env.PORT}`)
