@@ -22,7 +22,7 @@ AdminJS.registerAdapter(require('@adminjs/mongoose'))
 var compression = require('compression');
 const checkAuth = require('./utils/checkAuth.js');
 const checkAuthPlusAdmin = require('./utils/checkAuthPlusAdmin.js');
-var routesArray = [require('./routes/index.js')];
+var routesArray = [require('./routes/index.js'), require('./routes/pricing')];
 
 passport.serializeUser(function(user, done) {
     done(null, user);
