@@ -1,6 +1,6 @@
 const { models } = require('../db/connector.js');
 const renderFile = require('../utils/renderFile.js');
-const roles = require('../utils/roles');
+const rol = require('../utils/roles');
 
 const idToRole = require('../utils/idToRole.js');
 async function get(req, res) {
