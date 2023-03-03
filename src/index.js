@@ -36,6 +36,7 @@ var DiscordStrategy = require('passport-discord').Strategy,
     scopes = ['identify', 'email', 'guilds', 'guilds.join'],
     prompt = 'consent';
 
+    console.log(process.env.DISCORD_CALLBACK_URL);
 var discordStrat = new DiscordStrategy({
     clientID: process.env.DISCORD_CLIENT_ID,
     clientSecret: process.env.DISCORD_CLIENT_SECRET,
