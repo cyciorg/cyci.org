@@ -58,17 +58,28 @@
 
                   </div>
                   <% } else if (isAuthenticated) {%>
-                     <button
-                        class="flex items-center inline-block px-6 py-2 bg-gray-600 rounded-2xl text-sm px-4 py-2.5"
-                        data-dropdown-toggle="dropdown">
+                     <% if (user.premium_type==2) { %>
+                        <button class="flex items-center border-[#f3e3df] inline-block px-6 py-2 bg-gray-200 rounded text-sm px-4 py-2.5"
+                           data-dropdown-toggle="dropdown"
+                           style="background-repeat: no-repeat;background-size: 100% auto; background-image: url('https://cdn.discordapp.com/banners/<%- user.id %>/<%- user.banner %>.gif'); box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);">
+                           <li% } else { %>
+                              <button
+                                 class="flex items-center border-[#f3e3df] inline-block px-6 py-2 bg-gray-200 rounded text-sm px-4 py-2.5"
+                                 data-dropdown-toggle="dropdown"
+                                 style="background-repeat: no-repeat;background-size: 100% auto; background-image: url('https://cdn.discordapp.com/banners/<%- user.id %>/<%- user.banner %>.jpeg'); box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);">
+                                 <% } %>
                         <div class="mr-3">
                            <p class="text-sm text-white"><%- user.username %>#<%- user.discriminator %></p>
                            <p class="text-sm <%- role.color %>"><%- role.name %></p>                        
                         </div>
                         <div class="mr-2">
-                           <img class="w-10 h-10 rounded-full border border-green-200 object-cover object-right"
-                              src="https://static.shuffle.dev/uploads/files/30/30f6ae9455d04e79b93263e845c786c2443e6f8e/687474-1.GIF"
-                              alt="">
+                           <% if (user.premium_type==2) { %>
+                              <img class="w-10 h-10 rounded-full border border-green-200 object-cover object-right"
+                                 src="https://cdn.discordapp.com/avatars/<%- user.id %>/<%- user.avatar %>.gif" alt="">
+                              <% } else { %>
+                                 <img class="w-10 h-10 rounded-full border border-green-200 object-cover object-right"
+                                    src="https://cdn.discordapp.com/avatars/<%- user.id %>/<%- user.avatar %>.jpeg" alt="">
+                                 <% } %>
                         </div>
                         <span>
                            <svg class="text-gray-400" width="10" height="6" viewBox="0 0 10 6" fill="none"
