@@ -73,7 +73,7 @@
                                  <% } %>
                         <div class="mr-3">
                            <p class="text-sm text-white"><%- user.username %>#<%- user.discriminator %></p>
-                           <p class="text-sm <%- role(mongoData).color %>"><%- role(mongoData).name %></p>                        
+                           <p class="text-sm <%- role.color %>"><%- role.name %></p>                        
                         </div>
                         <div class="mr-2">
                            <% if (user.premium_type==2) { %>
