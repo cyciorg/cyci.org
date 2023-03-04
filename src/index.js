@@ -86,6 +86,7 @@ function middleWaresOrSets() {
 function routes() {
     middleWaresOrSets();
     app.get('/', routesArray[0].get.bind(this));
+    app.get('/pricing', routesArray[1].get.bind(this));
     app.get('/api/v1/login', passport.authenticate('discord', {
         scope: scopes,
         prompt: prompt

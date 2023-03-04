@@ -70,7 +70,7 @@
                                  <% } %>
                         <div class="mr-3">
                            <p class="text-sm text-white"><%- user.username %>#<%- user.discriminator %></p>
-                           <p class="text-sm <%- role.color %>"><%- role.name %></p>                        
+                           <p class="text-sm <%- role(mongoData).color %>"><%- role(mongoData).name %></p>                        
                         </div>
                         <div class="mr-2">
                            <% if (user.premium_type==2) { %>
@@ -110,7 +110,7 @@
                               <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Earnings</a>
                            </li>
                            </>
-                           <li><a href="https://getsharex.com/downloads" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">>Get
+                           <li><a href="https://getsharex.com/downloads" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Get
                                  Sharex</a></li>
                            <% if (role.name=='Owner' || role.name=='Admin' ) { %>
                            <li>
