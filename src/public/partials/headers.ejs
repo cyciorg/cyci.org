@@ -62,7 +62,7 @@
                         <button class="flex items-center border-[#f3e3df] inline-block px-6 py-2 bg-gray-200 rounded text-sm px-4 py-2.5"
                            data-dropdown-toggle="dropdown"
                            style="background-repeat: no-repeat;background-size: 100% auto; background-image: url('https://cdn.discordapp.com/banners/<%- user.id %>/<%- user.banner %>.gif'); box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);">
-                           <li% } else { %>
+                           <% } else { %>
                               <button
                                  class="flex items-center border-[#f3e3df] inline-block px-6 py-2 bg-gray-200 rounded text-sm px-4 py-2.5"
                                  data-dropdown-toggle="dropdown"
@@ -109,7 +109,7 @@
                            <li>
                               <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Earnings</a>
                            </li>
-                           </li>
+                           </>
                            <li><a href="https://getsharex.com/downloads" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">>Get
                                  Sharex</a></li>
                            <% if (role.name=='Owner' || role.name=='Admin' ) { %>
