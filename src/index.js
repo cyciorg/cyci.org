@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-var RateLimit = require('express-rate-limit');
-var MongoStore = require('rate-limit-mongo');
 const Sentry = require('@sentry/node');
 const Tracing = require("@sentry/tracing");
 const app = express();
@@ -115,37 +113,10 @@ function routes() {
                     actions: {
                         delete: {
                             guard: "Are you sure you wish to delete this record?"
-                        },
-                        regenerateToken: {
-                            actionType: 'record',
-                            icon: 'View',
-                            isVisible: true,
-                            component: './adminJsComponents/generateApiComp.jsx',
-                            handler: async (req, res, context) => {
-                                const user = context.record;
-                                const UserAc = context._admin.findResource('UserAccount')
-                                const crypto = require('crypto');
-                                user.param('api_token').value = crypto.randomBytes(32).toString('hex');
-                                return {
-                                    record: user.toJSON(context.currentAdmin)
-                                }
-                            }
                         }
-                    },
-                    properties: {
-                        api_token: {
-                            type: 'string',
-                            isVisible: {
-                                list: true,
-                                edit: true,
-                                filter: false,
-                                show: false,
-                            },
-                        },
-                    },
-
+                    }
                 }
-            }, ],
+            }],
             branding: {
                 companyName: 'Cyci Org',
                 logo: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
