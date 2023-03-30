@@ -53,8 +53,8 @@ passport.deserializeUser(function(obj, done) {
 // });
 
 function middleWaresOrSets() {
-    passport.use(discordStrat);
-    refresh.use(discordStrat);
+    // passport.use(discordStrat);
+    // refresh.use(discordStrat);
     app.use(compression());
     app.use(session({
         secret: 'secret',
