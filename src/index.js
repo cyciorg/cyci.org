@@ -155,7 +155,7 @@ function routes() {
             rootPath: '/admin',
         })
         const router = AdminJSExpress.buildRouter(AdminPanel, checkAuthPlusAdmin);
-        app.use(AdminPanel.options.rootPath, router)
+        //app.use(AdminPanel.options.rootPath, router)
         app.listen(process.env.PORT, function(err) {
           
             if (err) return console.log(err)
