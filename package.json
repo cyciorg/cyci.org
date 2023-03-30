@@ -32,6 +32,7 @@
     "randomstring": "^1.1.5",
     "rate-limit-mongo": "^2.3.2",
     "simple-encryptor": "^4.0.0",
+    "stripe": "^11.13.0",
     "winston": "^3.3.3",
     "wumpfetch": "^0.3.1"
   },
