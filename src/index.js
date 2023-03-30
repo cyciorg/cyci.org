@@ -1,3 +1,4 @@
+console.log(process.env)
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
@@ -106,26 +107,26 @@ function routes() {
     //});
 
     connectDb().then(async (errMongo) => {
-        const AdminPanel = new AdminJS({
-            resources: [{
-                resource: User,
-                options: {
-                    actions: {
-                        delete: {
-                            guard: "Are you sure you wish to delete this record?"
-                        }
-                    }
-                }
-            }],
-            branding: {
-                companyName: 'Cyci Org',
-                logo: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
-                softwareBrothers: false,
-                favicon: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
-            },
-            rootPath: '/admin',
-        })
-        const router = AdminJSExpress.buildRouter(AdminPanel, checkAuthPlusAdmin);
+        // const AdminPanel = new AdminJS({
+        //     resources: [{
+        //         resource: User,
+        //         options: {
+        //             actions: {
+        //                 delete: {
+        //                     guard: "Are you sure you wish to delete this record?"
+        //                 }
+        //             }
+        //         }
+        //     }],
+        //     branding: {
+        //         companyName: 'Cyci Org',
+        //         logo: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
+        //         softwareBrothers: false,
+        //         favicon: 'https://cdn.cyci.rocks/576688747481743/22613_CyciRocks_Rainbowsvg.svg',
+        //     },
+        //     rootPath: '/admin',
+        // })
+        // const router = AdminJSExpress.buildRouter(AdminPanel, checkAuthPlusAdmin);
         //app.use(AdminPanel.options.rootPath, router)
         app.listen(process.env.PORT, function(err) {
           
