@@ -31,26 +31,26 @@ passport.deserializeUser(function(obj, done) {
     done(null, obj);
 });
 
-var DiscordStrategy = require('passport-discord').Strategy,
-    refresh = require('passport-oauth2-refresh'),
-    scopes = ['identify', 'email', 'guilds', 'guilds.join'],
-    prompt = 'consent';
+// var DiscordStrategy = require('passport-discord').Strategy,
+//     refresh = require('passport-oauth2-refresh'),
+//     scopes = ['identify', 'email', 'guilds', 'guilds.join'],
+//     prompt = 'consent';
 
-    console.log(process.env.DISCORD_CALLBACK_URL);
-var discordStrat = new DiscordStrategy({
-    clientID: process.env.DISCORD_CLIENT_ID,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET,
-    callbackURL: process.env.DISCORD_CALLBACK_URL,
-    scope: scopes,
-    prompt: prompt
-}, function(accessToken, refreshToken, profile, cb) {
-    profile.refreshToken = refreshToken;
-    User.findOrCreate(profile, function(err, user) {
-        if (err) return cb(err);
-        return cb(profile, user);
-    });
-    return cb(null, profile);
-});
+//     console.log(process.env.DISCORD_CALLBACK_URL);
+// var discordStrat = new DiscordStrategy({
+//     clientID: process.env.DISCORD_CLIENT_ID,
+//     clientSecret: process.env.DISCORD_CLIENT_SECRET,
+//     callbackURL: process.env.DISCORD_CALLBACK_URL,
+//     scope: scopes,
+//     prompt: prompt
+// }, function(accessToken, refreshToken, profile, cb) {
+//     profile.refreshToken = refreshToken;
+//     User.findOrCreate(profile, function(err, user) {
+//         if (err) return cb(err);
+//         return cb(profile, user);
+//     });
+//     return cb(null, profile);
+// });
 
 function middleWaresOrSets() {
     passport.use(discordStrat);
@@ -87,25 +87,25 @@ function routes() {
     middleWaresOrSets();
     app.get('/', routesArray[0].get.bind(this));
     app.get('/pricing', routesArray[1].get.bind(this));
-    app.get('/api/v1/login', passport.authenticate('discord', {
-        scope: scopes,
-        prompt: prompt
-    }));
-    app.get('/api/v1/callback',
-        passport.authenticate('discord', {
-            failureRedirect: '/'
-        }),
-        function(req, res) {
-            res.redirect('/')
-        });
-    app.get('/api/v1/logout', function(req, res) {
-        req.logout(function(err) {
-            if (err) {
-                return next(err);
-            }
-            res.redirect('/');
-        });
-    });
+    // app.get('/api/v1/login', passport.authenticate('discord', {
+    //     scope: scopes,
+    //     prompt: prompt
+    // }));
+    // app.get('/api/v1/callback',
+    //     passport.authenticate('discord', {
+    //         failureRedirect: '/'
+    //     }),
+    //     function(req, res) {
+    //         res.redirect('/')
+    //     });
+    // app.get('/api/v1/logout', function(req, res) {
+    //     req.logout(function(err) {
+    //         if (err) {
+    //             return next(err);
+    //         }
+    //         res.redirect('/');
+    //     });
+    //});
 
     connectDb().then(async (errMongo) => {
         const AdminPanel = new AdminJS({
