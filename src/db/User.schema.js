@@ -195,7 +195,7 @@ UserAccount.statics.addImageOrFile = function addImageOrFile(user, data, cb){
 UserAccount.statics.findOrCreate = function findOrCreate(profile, cb){
   this.findOne({userid : profile.id},function(err,result){ 
     if (!result) {
-       var userObj = new exportUser({
+        var userObj = new exportUser({
           userid: profile.id,
           email: profile.email,
           avatar: profile.avatar,
