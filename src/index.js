@@ -1,46 +1,46 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const Sentry = require('@sentry/node');
-const Tracing = require("@sentry/tracing");
 const passport = require('passport');
 const path = require('path');
 const compression = require('compression');
+const Sentry = require('@sentry/node');
+const Tracing = require("@sentry/tracing");
 const DiscordStrategy = require('passport-discord').Strategy;
 const refresh = require('passport-oauth2-refresh');
-const User = require('./db/User.schema.js');
 const { connectDb } = require('./db/connector.js');
+const User = require('./db/User.schema.js');
 const roles = require('./utils/roles.js');
+const routes = require('./utils/routes.js');
 
 const app = express();
-const routes = [require('./routes/index.js').get, require('./routes/pricing').get];
 const scopes = ['identify', 'email', 'guilds', 'guilds.join'];
 const prompt = 'consent';
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-const discordStrat = new DiscordStrategy({
+passport.use(new DiscordStrategy({
     clientID: process.env.DISCORD_CLIENT_ID,
     clientSecret: process.env.DISCORD_CLIENT_SECRET,
     callbackURL: process.env.DISCORD_CALLBACK_URL,
     scope: scopes,
     prompt: prompt
-}, (accessToken, refreshToken, profile, cb) => {
-    profile.refreshToken = refreshToken;
-    User.findOrCreate(profile, (err, user) => {
-        if (err) return cb(err);
-        return cb(profile, user);
-    });
-    return cb(null, profile);
-});
+}, async (accessToken, refreshToken, profile, cb) => {
+    try {
+        profile.refreshToken = refreshToken;
+        const user = await User.findOrCreate(profile);
+        return cb(null, user);
+    } catch (err) {
+        return cb(err);
+    }
+}));
 
-passport.use(discordStrat);
-refresh.use(discordStrat);
+refresh.use('discord', passport);
 
 app.use(compression());
 app.use(session({
-    secret: 'secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));
@@ -64,20 +64,25 @@ app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 app.use(Sentry.Handlers.errorHandler());
 
-app.get('/', routes[0]);
-app.get('/pricing', routes[1]);
+// Use routes dynamically
+routes.forEach(route => {
+    app.get(route.path, route.handler);
+});
+
 app.get('/api/v1/login', passport.authenticate('discord', { scope: scopes, prompt: prompt }));
 app.get('/api/v1/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => res.redirect('/'));
 app.get('/api/v1/logout', (req, res) => {
-    req.logout(err => {
-        if (err) return next(err);
-        res.redirect('/');
-    });
+    req.logout();
+    res.redirect('/');
 });
 
 connectDb().then(errMongo => {
-    app.listen(process.env.PORT, err => {
-        if (err) return console.log(err);
-        console.log(`Listening on port ${process.env.PORT}`);
-    });
+    if (errMongo) {
+        console.error('Error connecting to MongoDB:', errMongo);
+    } else {
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    }
 });
