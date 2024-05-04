@@ -1,88 +1,122 @@
-require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
-const path = require('path');
-const compression = require('compression');
-const Sentry = require('@sentry/node');
-const Tracing = require("@sentry/tracing");
-const DiscordStrategy = require('passport-discord').Strategy;
-const refresh = require('passport-oauth2-refresh');
-const { connectDb } = require('./db/connector.js');
-const User = require('./db/User.schema.js');
-const roles = require('./utils/roles.js');
-const routes = require('./utils/routes.js');
+const OAuth2Strategy = require('passport-oauth2').Strategy;
+const mongoose = require('mongoose');
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost/mailcow_auth', { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
+
+// User schema
+const userSchema = new mongoose.Schema({
+    provider: String,
+    id: String,
+    username: String,
+    email: String,
+    accessToken: String
+});
+const User = mongoose.model('User', userSchema);
+
+// Configure session middleware with 30 days expiration
+const sessionMiddleware = session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
+    }
+});
+
+// Configure OAuth2 strategy
+passport.use('mailcow', new OAuth2Strategy({
+    authorizationURL: 'https://your-mailcow-instance.com/oauth2/auth',
+    tokenURL: 'https://your-mailcow-instance.com/oauth2/token',
+    clientID: 'your-client-id',
+    clientSecret: 'your-client-secret',
+    callbackURL: 'http://localhost:3000/login/callback',
+    userProfileURL: 'https://your-mailcow-instance.com/profile'
+}, (accessToken, refreshToken, profile, done) => {
+    // Check if user already exists in database
+    User.findOne({ provider: 'mailcow', id: profile.id }, (err, existingUser) => {
+        if (err) {
+            return done(err);
+        }
+        if (existingUser) {
+            // If user exists, update access token and return
+            existingUser.accessToken = accessToken;
+            existingUser.save(err => {
+                if (err) {
+                    return done(err);
+                }
+                return done(null, existingUser);
+            });
+        } else {
+            // If user does not exist, create a new user
+            const newUser = new User({
+                provider: 'mailcow',
+                id: profile.id,
+                username: profile.username,
+                email: profile.email,
+                accessToken: accessToken
+            });
+            newUser.save(err => {
+                if (err) {
+                    return done(err);
+                }
+                return done(null, newUser);
+            });
+        }
+    });
+}));
+
+// Serialize user to session
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+// Deserialize user from session
+passport.deserializeUser((id, done) => {
+    User.findById(id, (err, user) => {
+        done(err, user);
+    });
+});
 
 const app = express();
-const scopes = ['identify', 'email', 'guilds', 'guilds.join'];
-const prompt = 'consent';
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
+// Use session middleware
+app.use(sessionMiddleware);
 
-passport.use(new DiscordStrategy({
-    clientID: process.env.DISCORD_CLIENT_ID,
-    clientSecret: process.env.DISCORD_CLIENT_SECRET,
-    callbackURL: process.env.DISCORD_CALLBACK_URL,
-    scope: scopes,
-    prompt: prompt
-}, async (accessToken, refreshToken, profile, cb) => {
-    try {
-        profile.refreshToken = refreshToken;
-        const user = await User.findOrCreate(profile);
-        return cb(null, user);
-    } catch (err) {
-        return cb(err);
-    }
-}));
-
-refresh.use('discord', passport);
-
-app.use(compression());
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}));
+// Initialize Passport and restore authentication state from session
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.set('trust proxy', 1);
-app.set('view engine', 'ejs');
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'views'), { extensions: ['css'] }));
+// Login route
+app.get('/login', passport.authenticate('mailcow'));
 
-Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    integrations: [
-        new Sentry.Integrations.Http({ tracing: true }),
-        new Tracing.Integrations.Express({ app }),
-    ],
-    tracesSampleRate: 1.0,
-});
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
-app.use(Sentry.Handlers.errorHandler());
-
-// Use routes dynamically
-routes.forEach(route => {
-    app.get(route.path, route.handler);
-});
-
-app.get('/api/v1/login', passport.authenticate('discord', { scope: scopes, prompt: prompt }));
-app.get('/api/v1/callback', passport.authenticate('discord', { failureRedirect: '/' }), (req, res) => res.redirect('/'));
-app.get('/api/v1/logout', (req, res) => {
-    req.logout();
-    res.redirect('/');
-});
-
-connectDb().then(errMongo => {
-    if (errMongo) {
-        console.error('Error connecting to MongoDB:', errMongo);
-    } else {
-        const PORT = process.env.PORT || 3000;
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
+// Callback route after authentication
+app.get('/login/callback',
+    passport.authenticate('mailcow', { failureRedirect: '/login' }),
+    (req, res) => {
+        // Successful authentication, redirect to profile
+        res.redirect('/profile');
     }
+);
+
+// Profile route
+app.get('/profile', (req, res) => {
+    // Check if user is authenticated
+    if (!req.isAuthenticated()) {
+        res.redirect('/login');
+        return;
+    }
+
+    // User profile data is available in req.user
+    res.send(`Welcome, ${req.user.username}!<br>Your email is: ${req.user.email}`);
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
