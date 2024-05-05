@@ -23,7 +23,6 @@ app.use(
 
 // Serve static files.
 app.set('trust proxy', 1);
-app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public'), { extensions: ['css'] }));
 app.use(express.static(path.join(__dirname, 'views'), { extensions: ['css'] }));
 
