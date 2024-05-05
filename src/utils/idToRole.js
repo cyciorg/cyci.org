@@ -1,7 +1,7 @@
 function idToRole(id) {
     switch (id) {
         case 0:
-            return {name: 'User', color: "text-white-900"};
+            return {name: 'User', color: "text-white"};
         case 1:
             return {name: 'Premium', color: "text-gold-500"};
         case 2:

@@ -7,7 +7,7 @@
     <title>
         <%= title %> | Cyci
     </title>
-
+    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sen:wght@400;700&display=swap">
     <link rel="stylesheet" href="/css/tailwind/tailwind.min.css">
     <meta property="og:site_name" content="Cyci">
@@ -21,16 +21,43 @@
     <meta property="og:description" content="Cyci's pricing portal">
     <% } else if (title.toLowerCase()=="team" ) { %>
     <meta property="og:description" content="Meet the team behind Cyci!">
+    <% } else if (title.toLowerCase()=="privacy" ) { %>
+        <meta property="og:description" content="Cyci's privacy agreement page">
     <% } %>
     <meta name="theme-color" content="f4f4f4">
     <meta property="og:type" content="website">
     <meta property="og:title" content="<%= title %> | Cyci" />
     <meta property="og:image" content="/images/LOGO2.svg">
+    <meta name="description" content="Welcome to CYCI.org – your trusted partner for website and email hosting. With reliable infrastructure and 24/7 support, we ensure your online presence stays secure and accessible. Choose CYCI.org for seamless hosting solutions backed by our commitment to reliability.">
+    <meta name="keywords" content="Hosting,hostin,Hostin,website hosting,web hosting">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="15 days">
+    <meta name="author" content="Phillip Kinney">
+    <meta name="description" content="Welcome to CYCI.org – your trusted partner for website and email hosting. With reliable infrastructure and 24/7 support, we ensure your online presence stays secure and accessible. Choose CYCI.org for seamless hosting solutions backed by our commitment to reliability." />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cyci.org/" />
+    <meta property="og:title" content="<%= title %> | Cyci" />
+    <meta property="og:description" content="Welcome to CYCI.org – your trusted partner for website and email hosting. With reliable infrastructure and 24/7 support, we ensure your online presence stays secure and accessible. Choose CYCI.org for seamless hosting solutions backed by our commitment to reliability." />
+    <meta property="og:image" content="/images/LOGO2.svg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://cyci.org/" />
+    <meta property="twitter:title" content="<%= title %> | Cyci" />
+    <meta property="twitter:description" content="Welcome to CYCI.org – your trusted partner for website and email hosting. With reliable infrastructure and 24/7 support, we ensure your online presence stays secure and accessible. Choose CYCI.org for seamless hosting solutions backed by our commitment to reliability." />
+    <meta property="twitter:image" content="/images/LOGO2.svg" />
+
+    <!-- Meta Tags Generated with https://metatags.io -->
     <link rel="icon" href="/images/Showcase_LogoRainbow.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/images/Showcase_LogoRainbow.ico" type="image/x-icon"> <!-- For older browsers -->
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-    <link rel="icon" href="https://cdn.cyci.rocks/576688747481743/31453_LOGOONLY_Showcase_LogoRainbow.svg">
     <script src="./js/main.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4601989900812273"
+     crossorigin="anonymous"></script>
 </head>
 
 <body class="antialiased bg-body text-body font-body">
@@ -115,7 +142,7 @@
 
                                 <li>
                                     <a href="/logout"
-                                        class="text-sm hover:bg-red-400 text-white block px-4 py-2">Sign out</a>
+                                        class="text-sm hover:bg-red-100 text-white block px-4 py-2">Sign out</a>
                                 </li>
                             </ul>
                         </div>
