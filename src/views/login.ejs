@@ -18,13 +18,13 @@
           </div>
           <div class="w-full lg:w-1/2 px-4">
             <div class="px-6 lg:px-20 py-12 lg:py-24 bg-gray-600 rounded-lg">
-              <form action="#" data-bitwarden-watching="1">
+              <form action="/api/v2/login">
                 <h3 class="mb-10 text-2xl text-white font-bold font-heading">Login</h3>
                 <div class="inline-flex mb-10">
-                  <input class="mr-4" type="checkbox">
+                  <input class="mr-4" type="checkbox" id="confirmCheckbox">
                   <p class="-mt-2 text-sm text-gray-200">By logging in, you agree to our <a class="text-white" href="#">Terms, Data Policy</a> and <a class="text-white" href="#">Cookies.</a></p>
                 </div>
-                <button class="py-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition duration-200">Get started</button>
+                <button class="py-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition duration-200" id="logoutButton" disabled>Get started</button>
               </form>
             </div>
           </div>
@@ -32,4 +32,19 @@
       </div>
     </div>
   </section>
-  <%- include('./partials/footer', {disableNotif: false}) %>
+
+<%- include('./partials/footer', {disableNotif: false}) %>
+
+<script>
+    // Place your JavaScript code at the end of the body or within a document ready function
+    const confirmCheckbox = document.getElementById('confirmCheckbox');
+    const logoutButton = document.getElementById('logoutButton');
+    
+    // Function to enable/disable the button based on checkbox state
+    function toggleButton() {
+        logoutButton.disabled = !confirmCheckbox.checked;
+    }
+    
+    // Add event listener to checkbox
+    confirmCheckbox.addEventListener('change', toggleButton);
+</script>

@@ -100,7 +100,7 @@ app.use(passport.session());
 app.set('view engine', 'ejs');
 
 // Login route
-app.get('/login', passport.authenticate('mailcow'));
+app.get('/api/v2/login', passport.authenticate('mailcow'));
 
 // Callback route after authentication
 app.get(
@@ -111,13 +111,10 @@ app.get(
     }
 );
 
-// Profile route
-app.get('/profile', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.redirect('/login');
-        return;
-    }
-    res.send('Profile Information: ' + JSON.stringify(req.user)); // Assuming profile information is stored in req.user
+// Logout route
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
 });
 
 // Frontend Routes
