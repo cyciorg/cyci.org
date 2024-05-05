@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>
+        <%= title %> | Cyci
+    </title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sen:wght@400;700&display=swap">
+    <link rel="stylesheet" href="/css/tailwind/tailwind.min.css">
+    <meta property="og:site_name" content="Cyci">
+    <% if (title.toLowerCase()=="index" ) { %>
+    <meta property="og:description" content="Welcome to Cyci, a unique service center">
+    <% } else if (title.toLowerCase()=="login" ) { %>
+    <meta property="og:description" content="Cyci's User login portal">
+    <% } else if (title.toLowerCase()=="signup" ) { %>
+    <meta property="og:description" content="Cyci's User signup portal">
+    <% } else if (title.toLowerCase()=="pricing" ) { %>
+    <meta property="og:description" content="Cyci's pricing portal">
+    <% } else if (title.toLowerCase()=="team" ) { %>
+    <meta property="og:description" content="Meet the team behind Cyci!">
+    <% } %>
+    <meta name="theme-color" content="f4f4f4">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<%= title %> | Cyci" />
+    <meta property="og:image" content="/images/LOGO2.svg">
+    <link rel="icon" href="/images/Showcase_LogoRainbow.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/images/Showcase_LogoRainbow.ico" type="image/x-icon"> <!-- For older browsers -->
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="icon" href="https://cdn.cyci.rocks/576688747481743/31453_LOGOONLY_Showcase_LogoRainbow.svg">
+    <script src="./js/main.js"></script>
+</head>
+
+<body class="antialiased bg-body text-body font-body">
+    <div class="">
+
+        <section class="relative pb-20 bg-gray-800 overflow-hidden">
+            <% if (title == "Index") { %>
+            <div class="absolute bottom-0 inset-x-0 h-full bg-gradient-zospace-1"></div>
+
+            <% } %>
+            <nav class="relative">
+                <div class="flex py-8 px-4 lg:px-8 justify-between items-center">
+                    <button class="p-2 navbar-burger">
+                        <svg class="w-10 h-3" width="39" height="13" viewBox="0 0 39 13" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <rect width="39" height="2" rx="1" fill="#C4C4C4"></rect>
+                            <rect x="19" y="11" width="20" height="2" rx="1" fill="#C4C4C4"></rect>
+                        </svg>
+                    </button>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2">
+                        <a class="text-2xl text-white font-bold" href="#">
+                            <img class="h-14" src="https://cdn.cyci.rocks/393996898945728500/TEXTONLY_Showcase_LogoRainbow.svg" alt="" width="auto">
+                        </a>
+                    </div>
+                    <% if (!isAuthenticated) { %>
+                    <div class="hidden lg:block">
+                        <a class="inline-block mr-10 text-lg text-white hover:text-gray-50 font-bold border-b border-gray-200"
+                            href="/login">Login</a>
+
+                    </div>
+                    <% } else if (isAuthenticated) {%>
+                        <button
+                            class="flex items-center border-[#f3e3df] inline-block px-6 py-2 bg-gray-200 rounded text-sm px-4 py-2.5"
+                            data-dropdown-toggle="dropdown"
+                            style="background-repeat: no-repeat;background-size: 100% auto; background-color: black; box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);">
+
+                            <div class="mr-3">
+                                <p class="text-sm text-white"><%- user.username %></p>
+                                <p class="text-sm <%- role.color %>"><%- role.name %></p>
+                            </div>
+                            <div class="mr-2">
+                                
+                                <img class="w-10 h-10 rounded-full border border-green-200 object-cover object-right"
+                                    src="https://cdn.cyci.rocks/393996898945728500/CYCI_DC_LOGO_BLACK-01.png"
+                                    alt="">
+                            </div>
+                            <span>
+                                <svg class="text-gray-400" width="10" height="6" viewBox="0 0 10 6" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.08335 0.666657C8.75002 0.333323 8.25002 0.333323 7.91669 0.666657L5.00002 3.58332L2.08335 0.666657C1.75002 0.333323 1.25002 0.333323 0.916687 0.666657C0.583354 0.99999 0.583354 1.49999 0.916687 1.83332L4.41669 5.33332C4.58335 5.49999 4.75002 5.58332 5.00002 5.58332C5.25002 5.58332 5.41669 5.49999 5.58335 5.33332L9.08335 1.83332C9.41669 1.49999 9.41669 0.99999 9.08335 0.666657Z"
+                                        fill="currentColor"></path>
+                                </svg>
+                            </span>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div
+                            class="hidden bg-gray-500 text-base z-50 list-none divide-y divide-gray-100 rounded shadow my-4"
+                            id="dropdown">
+                            <div class="px-4 py-3">
+                                <span class="block text-sm text-white">Signed in</span>
+                                <span class="block text-sm font-mediumtruncate text-gray-200"><%-
+                                    userInfo.email %> </span>
+                            </div>
+                            <ul class="py-1" aria-labelledby="dropdown">
+                                <li>
+                                    <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Settings</a>
+                                </li>
+                                <li>
+                                    <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Earnings</a>
+                                </li>
+                                <li><a href="https://getsharex.com/downloads"
+                                        class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Get
+                                        Sharex</a></li>
+                                <!-- <% if (role.name=='Owner' || role.name=='Admin' ) { }%> -->
+                                <!-- <li>
+                                    <a href="/admin" class="text-sm hover:bg-red-100 text-red-400 block px-4 py-2">Admin</a>
+                                </li> -->
+
+                                <li>
+                                    <a href="/logout"
+                                        class="text-sm hover:bg-red-400 text-white block px-4 py-2">Sign out</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <script src="https://unpkg.com/@themesberg/flowbite@latest/dist/flowbite.bundle.js"></script>
+                        <% } %>
+                </div>
+            </nav>
+            <div class="hidden navbar-menu fixed top-0 left-0 bottom-0 w-5/6 max-w-sm z-50">
+                <div class="navbar-backdrop fixed inset-0 bg-gray-800 opacity-80"></div>
+                <nav class="relative flex flex-col py-8 h-full w-full bg-black overflow-y-auto">
+                    <div class="flex items-center mb-16 pr-6">
+                        <a class="ml-10 mr-auto text-2xl text-gray-800 font-bold" href="#">
+                            <img class="h-9" src="https://cdn.cyci.rocks/393996898945728500/TEXTONLY_Showcase_LogoRainbow.svg" alt="" width="auto">
+                        </a>
+                    </div>
+                    <div>
+                        <ul>
+                            <li class="mb-1 px-10"><a
+                                    class="block pl-8 py-4 text-xl text-white hover:bg-gray-600 rounded-xl"
+                                    href="/pricing">Pricing</a></li>
+                            <li class="mb-1 px-10"><a
+                                    class="block pl-8 py-4 text-xl text-white hover:bg-gray-600 rounded-xl"
+                                    href="https://github.com/cyciorg">Github</a></li>
+                            <li class="mb-1 px-10"><a
+                                    class="block pl-8 py-4 text-xl text-white hover:bg-gray-600 rounded-xl"
+                                    href="#">Features</a></li>
+                            <li class="mb-1 px-10"><a
+                                    class="block pl-8 py-4 text-xl text-white hover:bg-gray-600 rounded-xl"
+                                    href="mailto:contact@cyci.org">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="mt-auto px-10">
+                        <div class="pt-6"><a
+                                class="block mb-3 py-4 px-12 text-white text-center font-bold bg-blue-500 hover:bg-blue-600 rounded-full transition duration-200"
+                                href="/login">Login</a></div>
+                        <p class="mt-6 mb-4 text-lg text-center">
+                            <span>2023 © Cyci Org. All rights reserved.</span>
+                        </p>
+                    </div>
+                </nav>
+            </div>

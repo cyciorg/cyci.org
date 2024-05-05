@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-const User = require('./User.schema.js');
+const UserSchema = require('./schema/User.schema.js');
+const User = mongoose.model('User', UserSchema);
 
-const connectDb = () => {
-  mongoose.set('strictQuery', true);
-  return mongoose.connect(process.env.MONGO_URI);
+const connectDb = async () => {
+  return await mongoose.connect(process.env.MONGO_URI);
 };
 
 

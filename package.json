@@ -1,0 +1,28 @@
+{
+  "name": "cyci.org",
+  "version": "2.0.0-DEV",
+  "description": "Cyci's Main Website.",
+  "main": "ecosystem.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyciorg/cyci.org.git"
+  },
+  "author": "DopeDealers",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cyciorg/cyci.org/issues"
+  },
+  "homepage": "https://github.com/cyciorg/cyci.org#readme",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "mongoose": "^8.3.3",
+    "passport": "^0.7.0",
+    "passport-oauth2": "^1.8.0"
+  }
+}
