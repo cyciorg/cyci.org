@@ -1,3 +1,2 @@
 #Temp
-
-# TODO: nothing atm
+# TODO: REWRITE BACKEND/FRONTEND
