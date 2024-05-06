@@ -96,7 +96,8 @@
 
                             <div class="mr-3">
                                 <p class="text-sm text-white"><%- user.username %></p>
-                                <p class="text-sm <%- role.color %>"><%- role.name %></p>
+
+                                <!-- Temp until i can fix the EJS issue -->
                             </div>
                             <div class="mr-2">
                                 
@@ -130,7 +131,7 @@
                                     <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Settings</a>
                                 </li>
                                 <li>
-                                    <a href="#" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Earnings</a>
+                                    <a href="/api/v1/genconfig" class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Generate ShareX</a>
                                 </li>
                                 <li><a href="https://getsharex.com/downloads"
                                         class="text-sm hover:bg-gray-100 text-white block px-4 py-2">Get

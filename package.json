@@ -1,6 +1,6 @@
 {
   "name": "cyci.org",
-  "version": "2.0.5-DEV",
+  "version": "2.0.6-DEV",
   "description": "Cyci's Main Website.",
   "main": "ecosystem.config.js",
   "scripts": {
@@ -17,10 +17,16 @@
   },
   "homepage": "https://github.com/cyciorg/cyci.org#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.569.0",
+    "aws-sdk": "^2.1614.0",
     "axios": "^1.6.8",
+    "dayjs": "^1.11.11",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "formidable": "^3.5.1",
+    "hat": "^0.0.3",
+    "mime-types": "^2.1.35",
     "mongoose": "^8.3.3",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0"

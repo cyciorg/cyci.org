@@ -8,7 +8,7 @@ const { connectDb, models } = require('./db/connector.js');
 const routes = require('./utils/routes.js');
 const app = express();
 const path = require("path")
-
+var hat = require('hat');
 const snowflake = new Snowflake(1, 1609459200000);
 
 // Use session middleware
@@ -54,11 +54,13 @@ passport.use(
                 if (!user) {
                     // User doesn't exist, create a new user document
                     const userId = snowflake.generate();
+                    var rack = hat.rack();
                     user = new models.User({
                         userId: userId.toString(),
                         provider: 'mailcow',
                         email: userProfile.email,
                         username: userProfile.displayName,
+                        api_token: rack,
                         roles: [0]
                     });
                     await user.save();
@@ -119,6 +121,7 @@ app.get('/logout', (req, res) => {
 
 // Frontend Routes
 routes.forEach(route => {
+
     app.get(route.path, route.handler);
 });
 

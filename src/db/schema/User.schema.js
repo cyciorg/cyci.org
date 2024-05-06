@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true },
   fullName: { type: String },
   api_token: { type: String },
+  roles: { type: [String] },
   avatarUrl: { type: String },
   contactInfo: {
       phone: { type: String },
