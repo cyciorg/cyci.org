@@ -1,54 +1,135 @@
-
-const AmazonCDN = require('../utils/awsConnector');
-
 const formidable = require('formidable');
 const fileSettings = require('../utils/fileSettings');
-const {models} = require('../db/connector');
+const { models } = require('../db/connector');
 const mimeType = require('mime-types');
+const AmazonCDN = require('../utils/awsConnector');
+const VirusTotalApi = require('virustotal-api');
+
 const s3A = new AmazonCDN();
-//const NodeClam = require('clamscan');
-//const ClamScan = new NodeClam().init();
+const virusTotal = new VirusTotalApi({ apiKey: 'temp' });
+
+async function scanForViruses(file) {
+    return new Promise((resolve, reject) => {
+        virusTotal.fileScan(file.path, (err, res) => {
+            if (err) {
+                console.error("Error scanning for viruses:", err);
+                resolve(false);
+            } else {
+                const scanResult = res.data.attributes.last_analysis_stats;
+                const detected = scanResult.detected;
+                resolve(!detected);
+            }
+        });
+    });
+}
+
+async function fetchUserStorageInfo(userId) {
+    try {
+        const response = await axios.get(`https://mail.cyci.org/api/v1/storage/${userId}`, {
+            headers: {
+                Authorization: 'Bearer YOUR_MAILCOW_API_TOKEN'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user storage information:', error.response.data);
+        throw new Error('Failed to fetch user storage information from Mailcow API');
+    }
+}
 
 async function post(req, res) {
     res.setHeader('Content-Type', 'text/text');
-    let form = new formidable.IncomingForm();
-    let userHeaderInformation = req.headers;
-    //let ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'] || req.realAddress || req.connection.remoteAddress,who = req.headers['user-agent'] || "Undefined (1.0.0)";
-    if (!userHeaderInformation['x-user-email'] || !userHeaderInformation['x-user-id'] && !userHeaderInformation['x-user-api-token']) return res.json({error: `Unauthorized request`}); // logger.error(`Unauthorized request to /upload/ by ${ip} - ${who}`), 
-    let account = await models.User.findByEmailOrId({ email: userHeaderInformation['x-user-email'], userid: userHeaderInformation['x-user-id'] }).then();
-    if ((account instanceof Error)) return res.json({error: `Unauthorized request. user does not exist.`}); // logger.error(`Unauthorized request to /upload/ by ${ip} - ${who}`),
-    if (account.api_token !== userHeaderInformation['x-user-api-token']) return res.json({ error: `Unauthorized request. user api token is invalid.` }); // logger.error(`Unauthorized request to /upload/ by ${ip} - ${who}`),
-    //if (!account.api_token || account.api_token !== userHeaderInformation['x-user-api_token']) return res.json({ error: `Unauthorized request. User does not have an api token. Or api token does not match.` }); // logger.error(`Unauthorized request to /upload/ by ${ip} - ${who}`),
     
+    const form = new formidable.IncomingForm();
+    const userHeaderInformation = req.headers;
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    if (isIPBlacklisted(ip)) {
+        return res.status(403).json({ error: 'Your IP is blacklisted. Please contact support for assistance.' });
+    }
+
+    if (!userHeaderInformation['x-user-email'] || !userHeaderInformation['x-user-id'] || !userHeaderInformation['x-user-api-token']) {
+        return res.status(401).json({ error: `Unauthorized request` });
+    }
+
+    const account = await models.User.findByEmailOrId({ email: userHeaderInformation['x-user-email'], userid: userHeaderInformation['x-user-id'] });
+
+    if (!account) {
+        return res.status(401).json({ error: `Unauthorized request. User does not exist.` });
+    }
+
+    if (account.api_token !== userHeaderInformation['x-user-api-token']) {
+        return res.status(401).json({ error: `Unauthorized request. User API token is invalid.` });
+    }
+
+    let userStorageInfo;
+    try {
+        userStorageInfo = await fetchUserStorageInfo(account.email);
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to fetch user storage information.' });
+    }
+
     form.parse(req, async (err, fields, files) => {
-       // const { scannedFile, isInfected, viruses } = await clamscan.isInfected(files.cyciUploader.filepath);
-       // if (isInfected) return res.json({error: `File is infected: ${viruses.join(', ')}`}); // add blacklisting later
-        if (err) return res.json({error: `Error parsing form.`});
-        if (!files.cyciUploader) return res.json({error: `No file provided.`});
-        if (!files.cyciUploader.size) return res.json({error: `File is empty.`});
-        if (files.cyciUploader.size > fileSettings.maxFileSize) return res.json({error: `File is too large.`});
-        if (!files.cyciUploader && fields.key) return res.json({error: `Not using Sharex Uploader`})
-        let mimeFile = mimeType.extension(files.cyciUploader.mimetype);
-        if (!fileSettings.extensions.includes(mimeFile)) return res.json({error: `Invalid mime-type`});
-        let file = files.cyciUploader;
-        let fileData = {
+        if (err) {
+            return res.status(400).json({ error: `Error parsing form.` });
+        }
+
+        if (!files.cyciUploader) {
+            return res.status(400).json({ error: `No file provided.` });
+        }
+
+        const file = files.cyciUploader;
+
+        if (!file.size) {
+            return res.status(400).json({ error: `File is empty.` });
+        }
+
+        if (file.size > fileSettings.maxFileSize) {
+            return res.status(400).json({ error: `File is too large.` });
+        }
+
+        if (!fields.key) {
+            return res.status(400).json({ error: `Not using Sharex Uploader` });
+        }
+
+        const mimeFile = mimeType.extension(file.mimetype);
+
+        if (!fileSettings.extensions.includes(mimeFile)) {
+            return res.status(400).json({ error: `Invalid mime-type` });
+        }
+
+        const fileData = {
             fileName: file.originalFilename,
             fileType: file.type,
             fileSize: file.size,
             filePath: file.filepath,
             fileExtension: file.originalFilename.substring(file.originalFilename.lastIndexOf('.') + 1, file.originalFilename.length).toLowerCase()
         };
-        // TODO: add rate-limiting and other security measures
-        // TODO: add file-type-specific validation
-        // TODO: check if user has exceeded their quota
-        // TODO: Anti-DDoS measures
-        // TODO: Anti-Viral measures almost completed
-        let fileUpload = await s3A.uploadImage(account, fileData, fileData.filePath);
-        models.User.addImageOrFile(account, 
-            {name: fileData.fileName, id: fileUpload.id, value: fileUpload.url, size: fileData.fileSize, type: fileData.fileExtension, created_at: fileUpload.fileDateUpload}, function(err, result) {
-                if (err) return res.json({error: `Error adding file to database.`}) && console.log(err)
-                return res.json({cyciUploader: `https://${fileUpload.url}`}).status(200)
-            });
+
+        if (userStorageInfo.usedStorage + file.size > userStorageInfo.storageQuota) {
+            return res.status(400).json({ error: `User has exceeded their storage quota.` });
+        }
+
+        if (!await scanForViruses(file)) {
+            return res.status(400).json({ error: `File contains viruses.` });
+        }
+
+        const fileUpload = await s3A.uploadImage(account, fileData, fileData.filePath);
+
+        models.User.addImageOrFile(account, {
+            name: fileData.fileName,
+            id: fileUpload.id,
+            value: fileUpload.url,
+            size: fileData.fileSize,
+            type: fileData.fileExtension,
+            created_at: fileUpload.fileDateUpload
+        }, (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: `Error adding file to database.` });
+            }
+            return res.status(200).json({ cyciUploader: `https://${fileUpload.url}` });
+        });
     });
 }
 

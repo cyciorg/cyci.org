@@ -54,13 +54,12 @@ passport.use(
                 if (!user) {
                     // User doesn't exist, create a new user document
                     const userId = snowflake.generate();
-                    var rack = hat.rack();
                     user = new models.User({
                         userId: userId.toString(),
                         provider: 'mailcow',
                         email: userProfile.email,
                         username: userProfile.displayName,
-                        api_token: rack,
+                        api_token: hat.rack().toString,
                         roles: [0]
                     });
                     await user.save();
